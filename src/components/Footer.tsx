@@ -60,7 +60,7 @@ export default function Footer() {
               © {new Date().getFullYear()} Sudokult. All rights reserved.
             </span>
             <div className="flex items-center gap-4">
-              <Link href="#" className="label text-white/20 hover:text-white/40 transition-colors" style={{ fontSize: "0.6rem" }}>
+              <Link href="/privacy" className="label text-white/20 hover:text-white/40 transition-colors" style={{ fontSize: "0.6rem" }}>
                 Privacy
               </Link>
               <Link href="#" className="label text-white/20 hover:text-white/40 transition-colors" style={{ fontSize: "0.6rem" }}>

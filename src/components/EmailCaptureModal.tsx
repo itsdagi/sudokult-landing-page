@@ -13,21 +13,45 @@ interface EmailCaptureModalProps {
 export default function EmailCaptureModal({ isOpen, onClose }: EmailCaptureModalProps) {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || isSubmitting) return;
 
-    audioEngine.playVictory();
-    setIsSubmitted(true);
-    confetti({
-      particleCount: 120,
-      spread: 80,
-      origin: { y: 0.5 },
-      colors: ["#FF5722", "#8E24AA", "#FFD700"],
-    });
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/early-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
+      audioEngine.playVictory();
+      setIsSubmitted(true);
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.5 },
+        colors: ["#FF5722", "#8E24AA", "#FFD700"],
+      });
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,12 +97,17 @@ export default function EmailCaptureModal({ isOpen, onClose }: EmailCaptureModal
 
               <button
                 type="submit"
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#FF5722] via-[#E60000] to-[#8E24AA] text-white font-bold font-mono text-sm shadow-xl shadow-[#FF5722]/30 hover:shadow-[#FF5722]/50 hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#FF5722] via-[#E60000] to-[#8E24AA] text-white font-bold font-mono text-sm shadow-xl shadow-[#FF5722]/30 hover:shadow-[#FF5722]/50 hover:scale-[1.01] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                <span>Send Redeem Code</span>
+                <span>{isSubmitting ? "Sending…" : "Send Redeem Code"}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
+
+            {error && (
+              <p className="text-xs mt-3 text-[#FF6B6B] font-mono">{error}</p>
+            )}
 
             <p className="text-[11px] text-gray-500 font-mono mt-4">
               🔒 We respect your privacy. Zero spam. Unsubscribe anytime.

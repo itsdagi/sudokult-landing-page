@@ -2,20 +2,49 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import confetti from "canvas-confetti";
+
+type EarlyAccessStatus = "idle" | "submitting" | "success" | "error";
 
 export default function Hero() {
-  const [roomCode, setRoomCode] = useState("891-402");
-  const [joining, setJoining] = useState(false);
-  const [joined, setJoined] = useState(false);
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<EarlyAccessStatus>("idle");
+  const [message, setMessage] = useState("");
 
-  const handleJoin = (e: React.FormEvent) => {
+  const handleEarlyAccess = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!roomCode || joining) return;
-    setJoining(true);
-    setTimeout(() => {
-      setJoining(false);
-      setJoined(true);
-    }, 1100);
+    const trimmed = email.trim();
+    if (!trimmed || status === "submitting") return;
+
+    setStatus("submitting");
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/early-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setStatus("error");
+        setMessage(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
+      setStatus("success");
+      confetti({
+        particleCount: 180,
+        spread: 100,
+        origin: { y: 0.45 },
+        colors: ["#DD5123", "#8E24AA", "#FFD700"],
+      });
+    } catch {
+      setStatus("error");
+      setMessage("Network error. Please try again.");
+    }
   };
 
   return (
@@ -90,39 +119,152 @@ export default function Hero() {
               <span className="label text-white/25">Free · Android</span>
             </div>
 
-            {/* Room code simulator */}
-            <div style={{ maxWidth: "400px" }}>
-              <p className="label text-white/30 mb-3">Join a live duel by room code</p>
-              <form onSubmit={handleJoin} className="flex gap-2">
-                <input
-                  type="text"
-                  maxLength={7}
-                  value={roomCode}
-                  onChange={(e) => setRoomCode(e.target.value)}
-                  placeholder="000-000"
-                  className="flex-1 px-4 py-2.5 rounded-xl text-white placeholder-white/20 text-sm font-mono focus:outline-none transition-all"
-                  style={{
-                    background: "#111111",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    letterSpacing: "0.1em",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "rgba(221,81,35,0.5)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
-                />
-                <button
-                  type="submit"
-                  disabled={joining || joined}
-                  className="px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-60 shrink-0"
-                  style={{ background: "#DD5123" }}
-                >
-                  {joining ? "…" : joined ? "✓ Found" : "Join"}
-                </button>
-              </form>
-              {joined && (
-                <p className="text-xs mt-2 font-mono" style={{ color: "#DD5123" }}>
-                  Opponent found: Grandmaster_Vance (Lv.42)
-                </p>
-              )}
+            {/* Early testing email capture */}
+            <div className="relative float-slow" style={{ maxWidth: "540px" }}>
+              <div className="early-access-card relative rounded-3xl p-6 sm:p-8 glow-orange">
+                {/* Shimmer sweep across the panel */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                  <div
+                    className="absolute top-0 bottom-0 left-0 w-1/2 animate-shimmer"
+                    style={{
+                      background:
+                        "linear-gradient(100deg, transparent, rgba(255,255,255,0.06), transparent)",
+                    }}
+                  />
+                </div>
+
+                {status === "success" ? (
+                  <div className="relative text-center py-6">
+                    <div
+                      className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5"
+                      style={{
+                        background: "rgba(221,81,35,0.12)",
+                        border: "1px solid rgba(221,81,35,0.3)",
+                      }}
+                    >
+                      <span className="text-3xl">🎉</span>
+                    </div>
+                    <h3 className="heading-md text-white mb-2">You&apos;re on the list!</h3>
+                    <p className="text-white/50 text-sm mb-1">
+                      Early access is reserved for{" "}
+                      <span className="text-white font-bold">{email}</span>.
+                    </p>
+                    <p className="text-xs text-white/35">
+                      Watch your inbox for your beta invite + 500 Cipher Coins.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    {/* Beta badge */}
+                    <div className="inline-flex items-center gap-2 mb-6">
+                      <span
+                        className="w-2 h-2 rounded-full animate-live"
+                        style={{ background: "#DD5123" }}
+                      />
+                      <span className="label text-white/40" style={{ letterSpacing: "0.18em" }}>
+                        Early Access // Beta
+                      </span>
+                    </div>
+
+                    <h3
+                      className="text-white font-extrabold mb-6"
+                      style={{ fontSize: "1.75rem", lineHeight: 1.08, letterSpacing: "-0.02em" }}
+                    >
+                      Enter your email for{" "}
+                      <span style={{ color: "#DD5123" }}>early testing</span>
+                    </h3>
+
+                    <form
+                      onSubmit={handleEarlyAccess}
+                      className="flex flex-col sm:flex-row gap-3"
+                    >
+                      <div className="relative flex-1">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.75"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none"
+                        >
+                          <rect x="3" y="5" width="18" height="14" rx="3" />
+                          <path d="m3.5 7 8.5 6 8.5-6" />
+                        </svg>
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@email.com"
+                          className="w-full pl-11 pr-4 py-4 rounded-2xl text-white placeholder-white/25 text-sm focus:outline-none transition-all"
+                          style={{
+                            background: "#0D0D0D",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = "rgba(221,81,35,0.6)";
+                            e.target.style.boxShadow = "0 0 0 4px rgba(221,81,35,0.12)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = "rgba(255,255,255,0.12)";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={status === "submitting"}
+                        className="group shrink-0 inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl text-white font-bold text-sm transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-60"
+                        style={{
+                          background: "linear-gradient(90deg, #DD5123, #B8421C)",
+                          boxShadow: "0 10px 30px -10px rgba(221,81,35,0.7)",
+                        }}
+                      >
+                        {status === "submitting" ? (
+                          "Sending…"
+                        ) : (
+                          <>
+                            Get Early Access
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.2"
+                              className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                            >
+                              <path d="M5 12h14M13 6l6 6-6 6" />
+                            </svg>
+                          </>
+                        )}
+                      </button>
+                    </form>
+
+                    {status === "error" && (
+                      <p className="text-xs mt-3" style={{ color: "#FF6B6B" }}>
+                        {message}
+                      </p>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-2.5 mt-6">
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs text-white/45 border border-white/[0.08] bg-white/[0.04]">
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#DD5123" }} />
+                        10,000+ players waiting
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-white/45 border border-white/[0.08] bg-white/[0.04]">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3" style={{ color: "#DD5123" }}>
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                        No spam
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-white/45 border border-white/[0.08] bg-white/[0.04]">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3" style={{ color: "#DD5123" }}>
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                        Free forever
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>
