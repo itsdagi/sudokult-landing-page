@@ -42,23 +42,6 @@ export default function Hero() {
                 <span className="w-full h-1/3 animate-stripe" style={{ background: "#078930", animationDelay: "0s" }} />
                 <span className="w-full h-1/3 animate-stripe" style={{ background: "#FCDD09", animationDelay: "0.2s" }} />
                 <span className="w-full h-1/3 animate-stripe" style={{ background: "#DA121A", animationDelay: "0.4s" }} />
-
-                {/* National emblem — blue disc with a yellow star */}
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span
-                    className="flex items-center justify-center"
-                    style={{
-                      width: "9px",
-                      height: "9px",
-                      borderRadius: "50%",
-                      background: "#0F47AF",
-                    }}
-                  >
-                    <svg viewBox="0 0 24 24" style={{ width: "5px", height: "5px" }} fill="#FCDD09">
-                      <path d="M12 2l2.4 6.8H21.6l-5.7 4.4 2.2 6.8L12 15.6 5.9 20l2.2-6.8L2.4 8.8h7.2z" />
-                    </svg>
-                  </span>
-                </span>
               </span>
               <span className="label text-white/40">Multiplayer Magic Sudoku</span>
             </div>
