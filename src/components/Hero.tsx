@@ -29,9 +29,37 @@ export default function Hero() {
             {/* Category label */}
             <div className="flex items-center gap-3 mb-10">
               <span
-                className="w-2 h-2 rounded-full animate-live"
-                style={{ background: "#DD5123" }}
-              />
+                className="relative inline-flex flex-col shrink-0 overflow-hidden rounded-[3px] animate-live"
+                style={{
+                  width: "32px",
+                  height: "16px",
+                  border: "1px solid rgba(255,255,255,0.16)",
+                  boxShadow: "0 0 14px rgba(221,81,35,0.22)",
+                }}
+                aria-hidden="true"
+              >
+                {/* Ethiopian tricolor — green / yellow / red */}
+                <span className="w-full h-1/3" style={{ background: "#078930" }} />
+                <span className="w-full h-1/3" style={{ background: "#FCDD09" }} />
+                <span className="w-full h-1/3" style={{ background: "#DA121A" }} />
+
+                {/* National emblem — blue disc with a yellow star */}
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span
+                    className="flex items-center justify-center"
+                    style={{
+                      width: "9px",
+                      height: "9px",
+                      borderRadius: "50%",
+                      background: "#0F47AF",
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" style={{ width: "5px", height: "5px" }} fill="#FCDD09">
+                      <path d="M12 2l2.4 6.8H21.6l-5.7 4.4 2.2 6.8L12 15.6 5.9 20l2.2-6.8L2.4 8.8h7.2z" />
+                    </svg>
+                  </span>
+                </span>
+              </span>
               <span className="label text-white/40">Multiplayer Magic Sudoku</span>
             </div>
 
