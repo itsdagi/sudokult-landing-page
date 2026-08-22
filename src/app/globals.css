@@ -146,6 +146,13 @@
 }
 .animate-live { animation: live-pulse 1.4s ease-in-out infinite; }
 
+/* Staggered blink for Ethiopian flag stripes — green, then yellow, then red */
+@keyframes stripe-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+.animate-stripe { animation: stripe-blink 1.2s ease-in-out infinite; }
+
 /* Horizontal line separator */
 .hr { border: none; border-top: 1px solid var(--line); }
 

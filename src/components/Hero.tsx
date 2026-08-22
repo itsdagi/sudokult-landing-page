@@ -29,7 +29,7 @@ export default function Hero() {
             {/* Category label */}
             <div className="flex items-center gap-3 mb-10">
               <span
-                className="relative inline-flex flex-col shrink-0 overflow-hidden rounded-[3px] animate-live"
+                className="relative inline-flex flex-col shrink-0 overflow-hidden rounded-[3px]"
                 style={{
                   width: "32px",
                   height: "16px",
@@ -38,10 +38,10 @@ export default function Hero() {
                 }}
                 aria-hidden="true"
               >
-                {/* Ethiopian tricolor — green / yellow / red */}
-                <span className="w-full h-1/3" style={{ background: "#078930" }} />
-                <span className="w-full h-1/3" style={{ background: "#FCDD09" }} />
-                <span className="w-full h-1/3" style={{ background: "#DA121A" }} />
+                {/* Ethiopian tricolor — green / yellow / red, blinking in sequence */}
+                <span className="w-full h-1/3 animate-stripe" style={{ background: "#078930", animationDelay: "0s" }} />
+                <span className="w-full h-1/3 animate-stripe" style={{ background: "#FCDD09", animationDelay: "0.2s" }} />
+                <span className="w-full h-1/3 animate-stripe" style={{ background: "#DA121A", animationDelay: "0.4s" }} />
 
                 {/* National emblem — blue disc with a yellow star */}
                 <span className="absolute inset-0 flex items-center justify-center">
