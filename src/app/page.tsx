@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import MagicSpellShowcase from "@/components/MagicSpellShowcase";
 import AcademyAndSolo from "@/components/AcademyAndSolo";
 import DonationSection from "@/components/DonationSection";
+import EarlyAccessCTA from "@/components/EarlyAccessCTA";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
         <MagicSpellShowcase />
         <AcademyAndSolo />
         <DonationSection />
+        <EarlyAccessCTA />
       </main>
       <Footer />
     </div>
