@@ -62,6 +62,13 @@ export default function Navbar() {
           </nav>
 
           {/* CTA */}
+          <div className="hidden md:flex items-center gap-4">
+          <Link
+            href="/login"
+            className="label text-white/40 hover:text-white/80 transition-colors duration-200"
+          >
+            Sign In
+          </Link>
           <a
             href="https://play.google.com/store/apps"
             target="_blank"
@@ -74,6 +81,7 @@ export default function Navbar() {
             </svg>
             Play Store
           </a>
+          </div>
 
         </div>
       </div>
