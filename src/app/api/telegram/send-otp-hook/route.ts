@@ -48,8 +48,10 @@ export async function POST(request: Request) {
   try {
     await sendTelegramOtp(linked.telegram_chat_id, otp);
   } catch (err) {
-    console.error("Failed to deliver OTP via Telegram (chat unreachable).");
-    void err;
+    console.error(
+      "Failed to deliver OTP via Telegram:",
+      err instanceof Error ? err.message : err
+    );
     return Response.json({ error: { message: "Could not deliver code via Telegram." } }, { status: 400 });
   }
 
