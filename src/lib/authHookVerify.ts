@@ -16,11 +16,18 @@ export function verifyAuthHookSignature(params: {
   const id = headers.get("webhook-id");
   const timestamp = headers.get("webhook-timestamp");
   const signatureHeader = headers.get("webhook-signature");
-  if (!id || !timestamp || !signatureHeader) return false;
+  if (!id || !timestamp || !signatureHeader) {
+    console.error("Auth hook signature check failed: missing webhook-id/timestamp/signature header(s).");
+    return false;
+  }
 
   // Reject stale requests (5 minute tolerance).
   const ts = Number(timestamp);
-  if (!Number.isFinite(ts) || Math.abs(Date.now() / 1000 - ts) > 300) return false;
+  const skew = Math.abs(Date.now() / 1000 - ts);
+  if (!Number.isFinite(ts) || skew > 300) {
+    console.error(`Auth hook signature check failed: timestamp skew ${skew}s exceeds 300s tolerance.`);
+    return false;
+  }
 
   const secretKey = secret.startsWith("whsec_") ? secret.slice("whsec_".length) : secret;
   const secretBytes = Buffer.from(secretKey, "base64");
@@ -42,5 +49,8 @@ export function verifyAuthHookSignature(params: {
       return true;
     }
   }
+  console.error(
+    `Auth hook signature check failed: no candidate signature matched (secret starts with 'whsec_': ${secret.startsWith("whsec_")}, secret length: ${secret.length}).`
+  );
   return false;
 }
